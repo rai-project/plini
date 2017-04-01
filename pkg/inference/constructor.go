@@ -5,16 +5,16 @@ import (
 )
 
 type Constructor struct {
-	id    int
-	name  string
-	arity int
+	id   int
+	name string
+	kind Kind
 }
 
-func NewConstructor(name string, arity int) (Type, error) {
+func NewConstructor(name string, kind Kind) (Type, error) {
 	return &Constructor{
-		id:    <-genSym,
-		name:  name,
-		arity: arity,
+		id:   <-genSym,
+		name: name,
+		kind: kind,
 	}, nil
 }
 
