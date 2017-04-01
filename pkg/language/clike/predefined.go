@@ -1,6 +1,7 @@
 package clike
 
 import (
+	"runtime"
 	"strings"
 
 	"github.com/cznic/cc"
@@ -51,7 +52,6 @@ var basePredefines = `
 #define __FLT_MIN__ 0
 #define __DBL_MIN__ 0
 #define __LDBL_MIN__ 0
-void __GO__(char*, ...);
 `
 
 var archPredefines = map[TargetArch]string{
@@ -178,4 +178,15 @@ var model64 = &cc.Model{
 		cc.DoubleComplex:     {16, 16, 16, "complex128"},
 		cc.LongDoubleComplex: {16, 16, 16, "complex128"},
 	},
+}
+
+var (
+	archBits TargetArch
+	model    *cc.Model
+)
+
+func init() {
+	e := runtime.GOARCH
+	archBits = arches[e]
+	model = models[archBits]
 }

@@ -2,13 +2,9 @@ package clike
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/cznic/cc"
-	"github.com/cznic/ccir"
 	"github.com/cznic/mathutil"
-	"github.com/cznic/strutil"
 	cparser "github.com/xlab/c-for-go/parser"
 )
 
@@ -16,50 +12,58 @@ var (
 	ccTestdata string
 )
 
-func NewConfig(paths ...string) *cparser.Config {
+func newConfig(paths ...string) *cparser.Config {
 	return &cparser.Config{
 		SourcesPaths: paths,
-		IncludePaths: []string{"/usr/include"},
+		CCDefs:       false,
+		CCIncl:       false,
 	}
 }
 
-func Parse1(src []string, opts ...cc.Opt) (string, *cc.TranslationUnit, error) {
-	ip, err := cc.ImportPath()
-	if err != nil {
-		panic(err)
-	}
+func Parse1(files ...string) (string, *cc.TranslationUnit, error) {
+	conf := newConfig(files...)
+	a, b := cparser.ParseWith(conf)
+	return "", a, b
+}
 
+func Parse(files ...string) (string, *cc.TranslationUnit, error) {
 	modelName := fmt.Sprint(mathutil.UintPtrBits)
-	model, err := ccir.Model(modelName)
-	if err != nil {
-		return "", nil, err
+	predefined := builtinBase
+	predefined += basePredefines
+	if archDefs, ok := archPredefines[archBits]; ok {
+		predefined += fmt.Sprintf("\n%s", archDefs)
 	}
 
-	for _, v := range filepath.SplitList(strutil.Gopath()) {
-		p := filepath.Join(v, "src", ip, "testdata")
-		fi, err := os.Stat(p)
-		if err != nil {
-			continue
-		}
-
-		if fi.IsDir() {
-			ccTestdata = p
-			break
-		}
-	}
-	if ccTestdata == "" {
-		panic("cannot find cc/testdata/")
-	}
+	predefined = ""
 
 	ast, err := cc.Parse(
-		fmt.Sprintf(`
-#define __STDC_HOSTED__ 1
-#define __STDC_VERSION__ 199901L
-#define __STDC__ 1
-`),
-		src,
+		predefined,
+		files,
 		model,
-		opts...,
+		cc.AllowCompatibleTypedefRedefinitions(),
+		cc.EnableAlignOf(),
+		cc.EnableAlternateKeywords(),
+		cc.EnableAnonymousStructFields(),
+		cc.EnableAsm(),
+		cc.EnableBuiltinClassifyType(),
+		cc.EnableBuiltinConstantP(),
+		cc.EnableComputedGotos(),
+		cc.EnableDefineOmitCommaBeforeDDD(),
+		cc.EnableEmptyDeclarations(),
+		cc.EnableEmptyStructs(),
+		cc.EnableImaginarySuffix(),
+		cc.EnableImplicitFuncDef(),
+		cc.EnableImplicitIntType(),
+		cc.EnableLegacyDesignators(),
+		cc.EnableOmitConditionalOperand(),
+		cc.EnableOmitFuncArgTypes(),
+		cc.EnableOmitFuncRetType(),
+		cc.EnableParenthesizedCompoundStatemen(),
+		cc.EnableTypeOf(),
+		cc.EnableUnsignedEnums(),
+		cc.EnableWideBitFieldTypes(),
+		cc.ErrLimit(-1),
+		cc.SysIncludePaths([]string{"testdata/include/"}),
 	)
 	return modelName, ast, err
 }
