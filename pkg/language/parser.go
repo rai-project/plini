@@ -1,9 +1,5 @@
 package language
 
 import (
-	_ "github.com/goccmack/gocc""
+	_ "github.com/goccmack/gocc"
 )
-
-func foo() {
-	
-}
