@@ -4,6 +4,9 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
+	"github.com/rai-project/aws"
+	"github.com/rai-project/config"
+	"github.com/rai-project/store/s3"
 )
 
 type File interface {
@@ -23,12 +26,20 @@ type FileLocation struct {
 }
 
 var (
-	fileSystems = []FileSystem{
-		NewLocalFileSystem(),
-		NewMemoryFileSystem(),
-		NewS3FileSystem(),
-	}
+	fileSystems []FileSystem
 )
+
+func init() {
+	config.AfterInit(func() {
+		aws.Config.Wait()
+		s3.Config.Wait()
+		fileSystems = []FileSystem{
+			NewLocalFileSystem(),
+			NewMemoryFileSystem(),
+			NewS3FileSystem(),
+		}
+	})
+}
 
 func NewFileLocation(filePath string) *FileLocation {
 	return &FileLocation{

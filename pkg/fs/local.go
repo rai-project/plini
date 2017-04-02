@@ -47,5 +47,13 @@ func (l *LocalFileSystem) Open(loc *FileLocation) (File, error) {
 }
 
 func (l *LocalFileSystem) Accept(loc *FileLocation) bool {
-	return strings.HasPrefix(loc.Path, "file://")
+	if strings.HasPrefix(loc.Path, "file://") {
+		return true
+	}
+	if strings.HasPrefix(loc.Path, "mem://") ||
+		strings.HasPrefix(loc.Path, "s3://") ||
+		strings.HasPrefix(loc.Path, "minio://") {
+		return false
+	}
+	return true
 }
