@@ -5,6 +5,7 @@ import (
 	"github.com/rai-project/uuid"
 )
 
+// TODO:: this just needs a step function
 type Dataset interface {
 	ID() string
 	Split(int) Dataset
