@@ -7,3 +7,8 @@ Pipelines:
 - https://github.com/savaki/par
 - https://github.com/sdboyer/transducers-go
 - https://github.com/sailthru/stolos
+
+
+LLVM Gen:
+
+- https://github.com/llir/llvm
