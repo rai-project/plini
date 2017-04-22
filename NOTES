@@ -12,3 +12,7 @@ Pipelines:
 LLVM Gen:
 
 - https://github.com/llir/llvm
+
+Inference:
+
+- https://github.com/chewxy/hm
