@@ -1,7 +1,7 @@
 package scheduler
 
 import (
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/rai-project/config"
 	"github.com/rai-project/logger"
 )
